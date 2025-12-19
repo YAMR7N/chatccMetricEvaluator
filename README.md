@@ -181,12 +181,12 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.6.0)
-- ✅ **Real-time submit button validation** - Button now disabled by default
-- ✅ Submit button enables automatically when at least one metric is rated
-- ✅ Shows tooltip "Rate at least one metric to submit" when disabled
-- ✅ Reused progress bar's `checkCardHasRating()` logic for validation
-- ✅ Updates instantly as user interacts with inputs
+### Latest Changes (v1.6.1)
+- ✅ **Reverted to default values approach** - Boolean defaults to False, Count to 0, Text to blank
+- ✅ **Added confirmation modal** - Warns user when submitting without changing any values
+- ✅ Modal explains what defaults will be submitted (False/0/Blank)
+- ✅ User must explicitly confirm or cancel
+- ✅ Submit button always enabled (validation happens on click)
 
 ### Previous Updates (v1.5.9)
 - ✅ Fixed Boolean fields being prefilled with "False" by default
@@ -241,7 +241,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.6.0  
+**Version**: 1.6.1  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
