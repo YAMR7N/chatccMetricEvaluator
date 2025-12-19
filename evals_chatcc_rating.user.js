@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.6.0
+// @version      1.6.1
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -2151,6 +2151,58 @@
         });
     }
 
+    function showDefaultValuesConfirmation() {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'eval-confirm-overlay';
+
+            const dialog = document.createElement('div');
+            dialog.className = 'eval-confirm-dialog';
+            dialog.innerHTML = `
+                <h3>
+                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    No Values Changed
+                </h3>
+                <p>You haven't changed any rating values. Submitting will use default values:</p>
+                <ul style="text-align: left; margin: 16px 0; padding-left: 24px; color: var(--eval-text-secondary);">
+                    <li><strong>Boolean fields:</strong> False</li>
+                    <li><strong>Numerical fields:</strong> 0</li>
+                    <li><strong>Text fields:</strong> Blank</li>
+                </ul>
+                <p>Do you want to proceed with these default values?</p>
+                <div class="eval-confirm-actions">
+                    <button class="eval-confirm-btn eval-confirm-btn-no">Cancel</button>
+                    <button class="eval-confirm-btn eval-confirm-btn-yes">Yes, Submit Defaults</button>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(dialog);
+
+            const cleanup = () => {
+                overlay.remove();
+                dialog.remove();
+            };
+
+            dialog.querySelector('.eval-confirm-btn-yes').addEventListener('click', () => {
+                cleanup();
+                resolve(true);
+            });
+
+            dialog.querySelector('.eval-confirm-btn-no').addEventListener('click', () => {
+                cleanup();
+                resolve(false);
+            });
+
+            overlay.addEventListener('click', () => {
+                cleanup();
+                resolve(false);
+            });
+        });
+    }
+
     function hasPermissionToAddMetric() {
         // Check if user has permission (applies to all skills now)
         if (sheetsData.metricAddition.length === 0) return false;
@@ -2227,7 +2279,7 @@
                 <div class="eval-modal-footer">
                     <div class="eval-modal-footer-actions">
                         <button class="eval-btn eval-btn-secondary eval-modal-close">Cancel</button>
-                        <button class="eval-btn eval-btn-primary" id="eval-submit-btn" disabled title="Rate at least one metric to submit">Submit</button>
+                        <button class="eval-btn eval-btn-primary" id="eval-submit-btn">Submit</button>
                     </div>
                 </div>
             </div>
@@ -2289,28 +2341,8 @@
                 } else {
                     submitBtn.textContent = 'Process Metric(s)';
                 }
-                // Enable submit button for Add tab (has different validation)
-                submitBtn.disabled = false;
-                submitBtn.title = '';
-            } else if (tabName === 'rate') {
+            } else {
                 submitBtn.textContent = 'Submit';
-                // Check if any metrics are rated for Rate tab
-                const rateTab = overlay.querySelector('#eval-rate-tab');
-                if (rateTab) {
-                    const container = rateTab;
-                    const cards = container.querySelectorAll('#metrics-container .eval-metric-card');
-                    let hasAnyRating = false;
-                    
-                    for (const card of cards) {
-                        if (checkCardHasRating(card)) {
-                            hasAnyRating = true;
-                            break;
-                        }
-                    }
-                    
-                    submitBtn.disabled = !hasAnyRating;
-                    submitBtn.title = hasAnyRating ? '' : 'Rate at least one metric to submit';
-                }
             }
         }
     }
@@ -2517,41 +2549,6 @@
         // Setup keyboard navigation
         setupKeyboardNavigation(container, overlay);
 
-        // Update submit button state on any input change
-        const updateSubmitButton = () => {
-            updateMetricCompletionStatus(container);
-            
-            const submitBtn = overlay.querySelector('#eval-submit-btn');
-            if (!submitBtn) return;
-            
-            const cards = container.querySelectorAll('#metrics-container .eval-metric-card');
-            let hasAnyRating = false;
-            
-            for (const card of cards) {
-                if (checkCardHasRating(card)) {
-                    hasAnyRating = true;
-                    break;
-                }
-            }
-            
-            if (hasAnyRating) {
-                submitBtn.disabled = false;
-                submitBtn.title = '';
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.title = 'Rate at least one metric to submit';
-            }
-        };
-
-        // Add listeners to all rating inputs
-        container.querySelectorAll('input[type="radio"], input[type="number"], input[type="checkbox"], input[type="text"], textarea, select').forEach(input => {
-            input.addEventListener('change', updateSubmitButton);
-            input.addEventListener('input', updateSubmitButton);
-        });
-
-        // Initial check to set button state on load
-        updateSubmitButton();
-
         // Prevent negative numbers in count inputs
         container.querySelectorAll('input[type="number"]').forEach(input => {
             // Prevent minus sign, decimal point, and scientific notation from being typed
@@ -2728,57 +2725,68 @@
     }
 
     // Check if a metric card has any rating
+    // Smart logic: Only count as "rated" if all required fields are filled OR if only optional fields exist
     function checkCardHasRating(card) {
-        // Check if ANY Boolean radio button is selected (user interaction required)
-        const radioGroups = new Set();
-        card.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radioGroups.add(radio.name);
-        });
-        
-        // If there are radio groups, at least one must be checked
-        if (radioGroups.size > 0) {
-            let hasCheckedRadio = false;
-            for (const groupName of radioGroups) {
-                const checked = card.querySelector(`input[name="${groupName}"]:checked`);
-                if (checked) {
-                    hasCheckedRadio = true;
-                    break;
-                }
-            }
-            if (!hasCheckedRadio) return false;
-        }
+        // Check if there are any required fields without values
+        const requiredInputs = card.querySelectorAll('input[required], select[required], textarea[required]');
 
-        // Check if ANY input has been filled (Count, Text, etc.)
-        const numberInputs = card.querySelectorAll('input[type="number"]');
-        const textInputs = card.querySelectorAll('input[type="text"], textarea');
-        
-        let hasFilledInput = false;
-        for (const input of numberInputs) {
-            if (input.value && input.value.trim() !== '') {
-                hasFilledInput = true;
-                break;
-            }
-        }
-        
-        if (!hasFilledInput) {
-            for (const input of textInputs) {
-                if (input.value && input.value.trim() !== '') {
-                    hasFilledInput = true;
-                    break;
-                }
+        for (const input of requiredInputs) {
+            if (input.type === 'radio') {
+                // For radio buttons, check if any in the group is checked
+                const name = input.name;
+                const checked = card.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) return false;
+            } else if (input.type === 'checkbox') {
+                if (!input.checked) return false;
+            } else if (input.tagName === 'SELECT') {
+                if (!input.value || input.value === '') return false;
+            } else {
+                if (!input.value || input.value.trim() === '') return false;
             }
         }
 
-        // Check for select dropdowns with values
+        // Check for select elements that have "Select an option" as default (these need user action)
         const selects = card.querySelectorAll('select');
         for (const select of selects) {
-            if (select.value && select.value !== '') {
-                return true; // Has selection
+            // If select has no value and has a disabled placeholder, it needs selection
+            const hasPlaceholder = select.querySelector('option[disabled][selected]');
+            if (hasPlaceholder && (!select.value || select.value === '')) {
+                return false;
             }
         }
 
-        // Card is rated if: has checked radio OR has filled input
-        return radioGroups.size > 0 || hasFilledInput;
+        // If we have boolean fields with defaults (false), they're already "rated"
+        // If we have number fields with empty (defaulting to 0), they're "rated"
+        // If we have text fields empty (defaulting to blank), they're "rated"
+        // So if no required fields are missing and no selects need action, it's rated
+        return true;
+    }
+    
+    // Check if user has modified ANY input (for confirmation modal)
+    function hasUserModifiedAnyInput(container) {
+        // Check if any radio button is checked (none are checked by default now)
+        const anyRadioChecked = container.querySelector('input[type="radio"]:checked');
+        if (anyRadioChecked) return true;
+        
+        // Check if any number input has a value
+        const numberInputs = container.querySelectorAll('input[type="number"]');
+        for (const input of numberInputs) {
+            if (input.value && input.value.trim() !== '') return true;
+        }
+        
+        // Check if any text input has a value
+        const textInputs = container.querySelectorAll('input[type="text"], textarea');
+        for (const input of textInputs) {
+            if (input.value && input.value.trim() !== '') return true;
+        }
+        
+        // Check if any select has a value (non-default)
+        const selects = container.querySelectorAll('select');
+        for (const select of selects) {
+            if (select.value && select.value !== '') return true;
+        }
+        
+        return false; // Nothing modified
     }
 
     function getMetricHelpText(metric) {
@@ -2924,7 +2932,7 @@
                                     <span>True</span>
                                 </label>
                                 <label class="eval-checkbox-label">
-                                    <input type="radio" name="${inputName}" value="false">
+                                    <input type="radio" name="${inputName}" value="false" checked>
                                     <span>False</span>
                                 </label>
                             </div>
@@ -3003,7 +3011,7 @@
                                 <span>True<span class="eval-keyboard-hint">(T)</span></span>
                             </label>
                             <label class="eval-checkbox-label" data-key="F">
-                                <input type="radio" name="${camelCaseName}" value="false">
+                                <input type="radio" name="${camelCaseName}" value="false" checked>
                                 <span>False<span class="eval-keyboard-hint">(F)</span></span>
                             </label>
                         </div>
@@ -3819,6 +3827,16 @@
     async function handleRateSubmit(overlay, submitBtn) {
         const rateTab = overlay.querySelector('#eval-rate-tab');
         const footer = overlay.querySelector('.eval-modal-footer');
+        
+        // Check if user has modified any input
+        if (!hasUserModifiedAnyInput(rateTab)) {
+            // Show confirmation modal
+            const shouldProceed = await showDefaultValuesConfirmation();
+            if (!shouldProceed) {
+                return; // User cancelled
+            }
+        }
+        
         const ratings = [];
         let hasAtLeastOne = false;
 
