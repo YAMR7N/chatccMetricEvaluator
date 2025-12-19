@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.6.3
+// @version      1.6.4
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -340,7 +340,14 @@
         }
 
         .eval-form-group {
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .eval-form-group:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
         .eval-form-group label {
@@ -498,27 +505,35 @@
 
         .metric-template-json {
             width: 100%;
-            min-height: 150px;
-            padding: 12px;
-            background: var(--eval-card-bg);
-            border: 1.5px solid var(--eval-border);
+            min-height: 200px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed var(--eval-border);
             border-radius: 8px;
             color: var(--eval-text-primary) !important;
             font-size: 13px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
             resize: vertical;
             box-sizing: border-box;
+            transition: all 0.2s;
         }
 
         .metric-template-json::placeholder {
             color: var(--eval-text-muted) !important;
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         .metric-template-json:focus {
             outline: none;
             border-color: var(--eval-orange);
+            border-style: solid;
             box-shadow: 0 0 0 3px var(--eval-orange-light);
+            background: rgba(255, 167, 53, 0.03);
+        }
+
+        .metric-template-json:not(:placeholder-shown) {
+            border-style: solid;
+            border-color: var(--eval-success);
         }
 
         .eval-list-item {
@@ -1378,41 +1393,65 @@
             border-collapse: collapse;
             margin-bottom: 16px;
             font-size: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .eval-config-table th {
             text-align: left;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--eval-text-secondary);
-            font-weight: 500;
-            border-bottom: 1px solid var(--eval-border);
+            padding: 12px 16px;
+            background: rgba(255, 167, 53, 0.1);
+            color: var(--eval-orange);
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--eval-border);
         }
 
         .eval-config-table td {
-            padding: 12px;
-            border-bottom: 1px solid var(--eval-border);
-            vertical-align: top;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+        }
+
+        .eval-config-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
         }
 
         .eval-config-table input,
         .eval-config-table select {
             width: 100%;
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--eval-border);
-            border-radius: 4px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1.5px solid var(--eval-border);
+            border-radius: 6px;
             color: var(--eval-text-primary);
+            transition: all 0.2s;
+        }
+
+        .eval-config-table input:focus,
+        .eval-config-table select:focus {
+            outline: none;
+            border-color: var(--eval-orange);
+            background: rgba(255, 167, 53, 0.05);
         }
 
         .eval-action-btn {
-            background: none;
-            border: none;
-            color: var(--eval-text-muted);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--eval-error);
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
+            padding: 6px;
+            border-radius: 6px;
             transition: all 0.2s;
+        }
+
+        .eval-action-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--eval-error);
+            transform: scale(1.05);
         }
 
         .conf-list-builder {
@@ -1573,15 +1612,17 @@
         .eval-metric-form-card {
             background: var(--eval-card-bg);
             border: 1.5px solid var(--eval-border);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
             position: relative;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .eval-metric-form-card:hover {
-            border-color: rgba(255, 161, 53, 0.3);
+            border-color: rgba(255, 167, 53, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .eval-remove-metric-form {
@@ -3603,10 +3644,26 @@
         const container = overlay.querySelector('#eval-add-tab');
 
         container.innerHTML = `
+            <!-- Header Info -->
+            <div class="eval-note" style="margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, rgba(255, 167, 53, 0.1) 0%, rgba(255, 167, 53, 0.05) 100%); border: 1px solid rgba(255, 167, 53, 0.2); border-radius: 8px;">
+                <div style="display: flex; align-items: start; gap: 12px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                    <div>
+                        <h4 style="margin: 0 0 6px 0; color: var(--eval-orange); font-size: 14px; font-weight: 600;">Create New Evaluation Metric</h4>
+                        <p style="margin: 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.6;">
+                            Follow the 3-step process below. After filling the form, click "Process Metric(s)" to preview, then "Submit" to add to the system.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
             <div id="metric-forms-container"></div>
             <div class="eval-btn-group" id="add-tab-buttons">
                 <button class="eval-add-metric-btn" id="add-another-metric">
-                    <span>+ Add Another Metric</span>
+                    <span>+ Add Another Metric Form</span>
                 </button>
             </div>
 
@@ -3633,11 +3690,17 @@
         formCard.id = formId;
         formCard.innerHTML = `
             ${metricForms.length > 1 ? `<button class="eval-remove-metric-form" data-form="${formId}">×</button>` : ''}
+            
+            <!-- Step 1: Define Metrics -->
             <div class="eval-form-group">
-                <label>Metric(s) * <small style="color: var(--eval-text-muted);">(Add one or more)</small></label>
+                <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <span style="background: var(--eval-orange); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">1</span>
+                    <span style="font-size: 15px; font-weight: 600;">Define Metric(s)</span>
+                    <small style="color: var(--eval-text-muted); font-weight: normal;">(Required)</small>
+                </label>
                 <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid var(--eval-success); border-radius: 4px;">
                     <p style="margin: 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
-                        💡 <strong>Multiple metrics in this form:</strong> Use this when you want to add several metrics that share the <strong>same output format/template</strong>. For example, "wrongToolCalled" and "requiredToolMissing" might both track tool usage errors with the same structure.
+                        💡 Add multiple metrics here if they share the same template structure.
                     </p>
                 </div>
                 <table class="eval-config-table metric-pairs-table">
@@ -3662,20 +3725,54 @@
                         </tr>
                     </tbody>
                 </table>
-                <button class="eval-btn eval-btn-secondary add-metric-row-btn" type="button" style="width: 100%; padding: 8px; border-style: dashed; margin-top: 8px;">
-                    + Add Another Metric
+                <button class="eval-btn eval-btn-secondary add-metric-row-btn" type="button" style="width: 100%; padding: 10px; border-style: dashed; margin-top: 8px; font-weight: 500;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    Add Another Metric
                 </button>
             </div>
+            
+            <!-- Step 2: Template JSON -->
             <div class="eval-form-group">
-                <label>Template JSON *</label>
-                <textarea class="metric-template-json" rows="10" placeholder="Paste your JSON template here (with actual values, system will deduce structure)..." required></textarea>
+                <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <span style="background: var(--eval-orange); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">2</span>
+                    <span style="font-size: 15px; font-weight: 600;">Template JSON</span>
+                    <small style="color: var(--eval-text-muted); font-weight: normal;">(Required)</small>
+                </label>
+                <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(59, 130, 246, 0.08); border-left: 3px solid #3B82F6; border-radius: 4px;">
+                    <p style="margin: 0 0 8px 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
+                        📋 Paste a JSON template with <strong>actual values</strong>. The system will analyze the structure and field types.
+                    </p>
+                    <details style="margin-top: 8px;">
+                        <summary style="cursor: pointer; color: var(--eval-orange); font-weight: 500; font-size: 13px;">Show Example</summary>
+                        <pre style="margin: 8px 0 0 0; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; font-size: 12px; overflow-x: auto; color: var(--eval-text-secondary);">{
+  "Request_Service": {
+    "Supposed_To_Be_Called": true,
+    "numberTimes_Supposed_To_Be_Called": 2
+  }
+}</pre>
+                    </details>
+                </div>
+                <textarea class="metric-template-json" rows="10" placeholder="Paste your JSON template here..." required></textarea>
             </div>
+            
+            <!-- Step 3: Select Skills -->
             <div class="eval-form-group">
-                <label>Skills *</label>
-                <div style="margin-bottom: 8px;">
-                    <label class="eval-checkbox-label">
+                <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <span style="background: var(--eval-orange); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">3</span>
+                    <span style="font-size: 15px; font-weight: 600;">Select Target Skills</span>
+                    <small style="color: var(--eval-text-muted); font-weight: normal;">(Required)</small>
+                </label>
+                <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(139, 92, 246, 0.08); border-left: 3px solid #8B5CF6; border-radius: 4px;">
+                    <p style="margin: 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
+                        🎯 Choose which skills this metric applies to. Select "All Skills" for universal metrics.
+                    </p>
+                </div>
+                <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 6px;">
+                    <label class="eval-checkbox-label" style="cursor: pointer;">
                         <input type="checkbox" class="skill-all" data-form="${formId}">
-                        <span>All Skills</span>
+                        <span style="font-weight: 600;">All Skills</span>
                     </label>
                 </div>
                 <div class="eval-skills-selector">
