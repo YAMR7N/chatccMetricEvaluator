@@ -181,7 +181,16 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.6.1)
+### Latest Changes (v1.6.3)
+- ✅ Changed metric counting to count cards instead of individual metrics
+- ✅ Grouped metrics now show as single card: "Metric 1/2" instead of "Metrics (1-2)/3"
+- ✅ More intuitive numbering - each card = one item
+
+### Previous Updates (v1.6.2)
+- ✅ Added logging to validation logic for debugging
+- ✅ Fixed `hasUserModifiedAnyInput()` to only detect "True" selections (not default "False")
+
+### Earlier Updates (v1.6.1)
 - ✅ **Reverted to default values approach** - Boolean defaults to False, Count to 0, Text to blank
 - ✅ **Added confirmation modal** - Warns user when submitting without changing any values
 - ✅ Modal explains what defaults will be submitted (False/0/Blank)
@@ -241,7 +250,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.6.1  
+**Version**: 1.6.3  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
