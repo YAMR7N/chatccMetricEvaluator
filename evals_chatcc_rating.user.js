@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.5.8
+// @version      1.5.9
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -2853,7 +2853,7 @@
                                     <span>True</span>
                                 </label>
                                 <label class="eval-checkbox-label">
-                                    <input type="radio" name="${inputName}" value="false" checked>
+                                    <input type="radio" name="${inputName}" value="false">
                                     <span>False</span>
                                 </label>
                             </div>
@@ -2932,7 +2932,7 @@
                                 <span>True<span class="eval-keyboard-hint">(T)</span></span>
                             </label>
                             <label class="eval-checkbox-label" data-key="F">
-                                <input type="radio" name="${camelCaseName}" value="false" checked>
+                                <input type="radio" name="${camelCaseName}" value="false">
                                 <span>False<span class="eval-keyboard-hint">(F)</span></span>
                             </label>
                         </div>
