@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.5.7
+// @version      1.5.8
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -111,18 +111,18 @@
             font-weight: 500;
             font-size: 14px;
             color: white;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 147, 53, 0.3);
         }
 
         .eval-button:hover {
             background-color: var(--eval-orange-hover);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 4px 12px rgba(255, 157, 53, 0.4);
         }
 
         .eval-button:active {
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 147, 53, 0.3);
         }
 
         .eval-button svg {
@@ -189,7 +189,7 @@
             bottom: 0;
             width: 8px;
             cursor: ew-resize;
-            background: linear-gradient(90deg, rgba(255, 107, 53, 0.3) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(255, 147, 53, 0.3) 0%, transparent 100%);
             transition: all 0.2s;
             z-index: 10;
             display: flex;
@@ -444,7 +444,7 @@
         .eval-list-add-btn:hover {
             background: var(--eval-orange-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 147, 53, 0.3);
         }
 
         .eval-list-items {
@@ -471,7 +471,7 @@
         .eval-process-json-btn:hover {
             background: var(--eval-orange-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 147, 53, 0.3);
         }
 
         .eval-template-preview {
@@ -759,7 +759,7 @@
             align-items: center;
             gap: 6px;
             background: rgba(255, 107, 53, 0.15);
-            border: 1px solid rgba(255, 107, 53, 0.3);
+            border: 1px solid rgba(255, 147, 53, 0.3);
             padding: 4px 10px;
             border-radius: 12px;
             margin-bottom: 10px;
@@ -1182,13 +1182,13 @@
         .eval-btn-primary {
             background: var(--eval-orange);
             color: #fff;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 147, 53, 0.3);
         }
 
         .eval-btn-primary:hover:not(:disabled) {
             background: var(--eval-orange-hover);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 4px 12px rgba(255, 157, 53, 0.4);
         }
 
         .eval-btn-primary:active:not(:disabled) {
@@ -1561,13 +1561,13 @@
             font-weight: 600;
             margin-top: 16px;
             transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 147, 53, 0.3);
         }
 
         .eval-add-metric-btn:hover {
             background: var(--eval-orange-hover);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 4px 12px rgba(255, 157, 53, 0.4);
         }
 
         .eval-metric-form-card {
@@ -1581,7 +1581,7 @@
         }
 
         .eval-metric-form-card:hover {
-            border-color: rgba(255, 107, 53, 0.3);
+            border-color: rgba(255, 161, 53, 0.3);
         }
 
         .eval-remove-metric-form {
@@ -1818,7 +1818,7 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 4px 12px rgba(255, 157, 53, 0.4);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -1837,8 +1837,8 @@
         }
 
         @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4); }
-            50% { box-shadow: 0 4px 20px rgba(255, 107, 53, 0.6); }
+            0%, 100% { box-shadow: 0 4px 12px rgba(255, 157, 53, 0.4); }
+            50% { box-shadow: 0 4px 20px rgba(255, 151, 53, 0.6); }
         }
 
         /* Refresh overlay indicator */
@@ -2019,7 +2019,6 @@
 
     async function loadAllSheets() {
         try {
-            console.log('=== Loading Sheets ===');
             const [metricAddition, metrics, configuration] = await Promise.all([
                 fetchGoogleSheet('Metric Addition'),
                 fetchGoogleSheet('Metrics'),
@@ -2028,26 +2027,18 @@
 
             sheetsData.metricAddition = metricAddition;
 
-            // Log detailed Metrics sheet data
-            console.log('=== Metrics Sheet Raw Data ===');
-            console.log('Total Metrics rows:', metrics.length);
-            console.log('All Metrics:', JSON.stringify(metrics, null, 2));
-            console.log('Metrics column names:', metrics.length > 0 ? Object.keys(metrics[0]) : 'No data');
-
             // Expand metrics with comma-separated definitions
             const expandedMetrics = [];
             metrics.filter(m => m.Enabled && m.Enabled.toLowerCase() === 'true').forEach(metric => {
                 if (metric.Definition && metric.Definition.includes(',')) {
-                    // Split definitions and descriptions
                     const definitions = metric.Definition.split(',').map(d => d.trim());
                     const descriptions = metric.Description ? metric.Description.split(',').map(d => d.trim()) : [];
 
-                    // Create separate metric entry for each definition
                     definitions.forEach((def, index) => {
                         expandedMetrics.push({
                             ...metric,
                             Definition: def,
-                            Description: descriptions[index] || '' // Map description or empty if not enough
+                            Description: descriptions[index] || ''
                         });
                     });
                 } else {
@@ -2058,84 +2049,37 @@
             sheetsData.metrics = expandedMetrics;
             sheetsData.configuration = configuration;
 
-            // Extract Rated Conversations from Configuration sheet (rows that have data in "Rated Conversations" column)
             sheetsData.ratedConversations = configuration.filter(row =>
                 row['Rated Conversations'] && row['Rated Conversations'].trim() !== ''
             );
 
-            console.log('Metric Addition rows:', sheetsData.metricAddition.length);
-            console.log('Metrics rows (enabled only):', sheetsData.metrics.length);
-            console.log('Configuration rows:', sheetsData.configuration.length);
-            console.log('Rated Conversations rows (from Configuration column):', sheetsData.ratedConversations.length);
-                console.log('Sample Metric:', sheetsData.metrics[0]);
-                console.log('Sample Rated Conversation:', sheetsData.ratedConversations[0]);
-
-                // Check if any metric has a Template
-                const metricsWithTemplate = sheetsData.metrics.filter(m => m.Template && m.Template.trim() !== '');
-                console.log('Metrics with Template:', metricsWithTemplate.length);
-                if (metricsWithTemplate.length > 0) {
-                    console.log('Sample Template:', metricsWithTemplate[0].Template);
-                }
-
-                console.log('=== Sheets Loaded Successfully ===');
-
             return true;
         } catch (error) {
-            console.error('Error loading sheets:', error);
+            console.error('[EVAL] ❌ Error loading sheets:', error);
             return false;
         }
     }
 
     function getCurrentUserInfo() {
-        console.log('[EVAL] 🔍 getCurrentUserInfo: Extracting user and conversation data...');
-        
         const usernameEl = document.querySelector('.user-status-badge');
         currentUsername = usernameEl?.innerText.trim() || 'unknown';
-        console.log('[EVAL] 👤 Username element found:', !!usernameEl, '| Value:', currentUsername);
 
         const skillEl = Array.from(document.querySelectorAll('.client-info-item')).find(el =>
             el.querySelector('.key')?.innerText.trim() === 'Skill'
         );
         currentSkill = skillEl?.querySelector('.value')?.innerText.trim() || '';
-        console.log('[EVAL] 🎯 Skill element found:', !!skillEl, '| Value:', currentSkill || '(empty)');
 
         const convIdEl = Array.from(document.querySelectorAll('.client-info-item')).find(el =>
             el.querySelector('.key')?.innerText.trim() === 'Conversation ID'
         );
         currentConversationId = convIdEl?.querySelector('.value')?.innerText.trim() || '';
-        console.log('[EVAL] 💬 Conversation ID element found:', !!convIdEl, '| Value:', currentConversationId || '(empty)');
-
-        console.log('[EVAL] 📊 === Current User Info Summary ===');
-        console.log('[EVAL] 📊 Username:', currentUsername);
-        console.log('[EVAL] 📊 Skill:', currentSkill || '(not set)');
-        console.log('[EVAL] 📊 Conversation ID:', currentConversationId || '(not set)');
-        console.log('[EVAL] 📊 ================================');
-        
-        if (!currentConversationId) {
-            console.warn('[EVAL] ⚠️ No conversation ID found - you may be on the inbox/list page');
-        }
     }
 
     function checkIfAlreadyRated() {
-        console.log('[EVAL] 🔍 checkIfAlreadyRated: Checking against rated conversations...');
-        console.log('[EVAL] 📊 Total rated conversations in database:', sheetsData.ratedConversations.length);
-        
         isAlreadyRated = sheetsData.ratedConversations.some(row =>
             row.Skill?.toLowerCase() === currentSkill.toLowerCase() &&
             row['Rated Conversations'] === currentConversationId
         );
-
-        console.log('[EVAL] 🔍 Check result:', {
-            conversationId: currentConversationId,
-            skill: currentSkill,
-            alreadyRated: isAlreadyRated
-        });
-        
-        if (isAlreadyRated) {
-            console.log('[EVAL] ⚠️ This conversation has already been rated');
-        } else {
-            console.log('[EVAL] ✅ This conversation has NOT been rated yet');
-        }
     }
 
     function showRatedBanner() {
@@ -2221,39 +2165,15 @@
     }
 
     function getMetricsForSkill() {
-        console.log('=== getMetricsForSkill Debug ===');
-        console.log('Current Skill:', currentSkill);
-        console.log('Total Metrics Available:', sheetsData.metrics.length);
-        console.log('All Metrics:', sheetsData.metrics);
-
-        const filtered = sheetsData.metrics.filter(metric => {
-            console.log(`Checking metric: ${metric.Definition}`);
-            console.log(`  - Skills field:`, metric.Skills);
-
-            if (!metric.Skills) {
-                console.log(`  - SKIPPED: No Skills field`);
-                return false;
-            }
+        return sheetsData.metrics.filter(metric => {
+            if (!metric.Skills) return false;
 
             const skills = metric.Skills.split(',').map(s => s.trim().toLowerCase());
-            console.log(`  - Parsed skills:`, skills);
-            console.log(`  - Current skill lowercase:`, currentSkill.toLowerCase());
-
             const hasAll = skills.includes('all');
             const hasCurrentSkill = skills.includes(currentSkill.toLowerCase());
 
-            console.log(`  - Has 'all':`, hasAll);
-            console.log(`  - Has current skill:`, hasCurrentSkill);
-            console.log(`  - RESULT:`, hasAll || hasCurrentSkill ? 'INCLUDED' : 'EXCLUDED');
-
             return hasAll || hasCurrentSkill;
         });
-
-        console.log('Filtered Metrics Count:', filtered.length);
-        console.log('Filtered Metrics:', filtered);
-        console.log('=== End Debug ===');
-
-        return filtered;
     }
 
     function getAllSkills() {
@@ -2503,20 +2423,13 @@
                 badgeText = `Metric ${startIndex}/${totalMetricsCount}`;
             }
 
-            console.log('=== Processing Metric Group ===');
-            console.log('Definitions:', metricNames);
-            console.log('Badge:', badgeText);
-            console.log('CamelCase Names:', camelCaseNames);
-            console.log('Has Template?', !!firstMetric.Template);
-
             // Parse template if it exists
             let template = null;
             if (firstMetric.Template) {
                 try {
                     template = JSON.parse(firstMetric.Template);
-                    console.log('✓ Template parsed successfully:', template);
                 } catch (e) {
-                    console.error('✗ Failed to parse template:', e);
+                    console.error('[EVAL] Template parse error:', e);
                 }
             }
 
@@ -4691,28 +4604,11 @@
 
     // Initialize on conversation change
     async function initializeForConversation() {
-        console.log('[EVAL] 🔄 initializeForConversation: Starting initialization...');
         getCurrentUserInfo();
         
-        console.log('[EVAL] 👤 User Info:', {
-            username: currentUsername,
-            skill: currentSkill,
-            conversationId: currentConversationId
-        });
-        
         if (currentConversationId) {
-            console.log('[EVAL] 📥 Conversation ID detected, loading sheets data...');
-            const success = await loadAllSheets();
-            if (success) {
-                console.log('[EVAL] ✅ Sheets loaded, checking if already rated...');
-                checkIfAlreadyRated();
-                console.log('[EVAL] 📊 Initialization complete. Already rated:', isAlreadyRated);
-            } else {
-                console.error('[EVAL] ❌ Failed to load sheets during initialization');
-            }
-        } else {
-            console.warn('[EVAL] ⚠️ No conversation ID found - skipping sheets load');
-            console.log('[EVAL] 💡 Tip: Make sure you are viewing a specific conversation');
+            await loadAllSheets();
+            checkIfAlreadyRated();
         }
     }
 
@@ -4723,10 +4619,6 @@
         const targetButton = document.querySelector('button.source-icon');
         
         if (targetButton && !buttonExists) {
-            console.log('[EVAL] 🔧 Observer: Button disappeared, re-injecting...');
-            console.log('[EVAL] 📍 Target button present:', !!targetButton);
-            console.log('[EVAL] 📍 Eval button present:', !!buttonExists);
-            // Inject with current state (data should already be loaded)
             injectButton();
         }
 
@@ -4741,29 +4633,20 @@
         });
 
         if (conversationChanged) {
-            console.log('[EVAL] 🔄 Observer: Conversation change detected in DOM');
-            // Remove existing button first to prevent state conflicts
             const existingButton = document.querySelector('.eval-button');
             if (existingButton) {
-                console.log('[EVAL] 🗑️ Observer: Removing old button before re-initialization');
                 existingButton.remove();
             }
             
             setTimeout(async () => {
-                console.log('[EVAL] ⏱️ Observer: Re-initializing after 1s delay...');
-                // Load data first, then inject button with correct state
                 await initializeForConversation();
                 injectButton();
-                
-                // Note: Modal refresh is now handled by polling (startConversationPolling)
-                // This provides more reliable detection of conversation changes
             }, 1000);
         }
     });
 
     // Refresh modal content when conversation changes
     async function refreshModalContent(overlay, newConvoId) {
-        console.log('🔄 Refreshing rating panel for new conversation:', newConvoId || currentConversationId);
 
         const modal = overlay.querySelector('.eval-modal');
         if (!modal) return;
@@ -4849,12 +4732,9 @@
 
             // Check if conversation changed
             if (newConvoId && newConvoId !== lastKnownConversationId) {
-                console.log('📍 Conversation changed:', lastKnownConversationId, '→', newConvoId);
                 lastKnownConversationId = newConvoId;
                 currentConversationId = newConvoId;
                 currentSkill = newSkill;
-
-                // Refresh the modal
                 refreshModalContent(activeModalOverlay, newConvoId);
             }
         }, 500); // Check every 500ms
@@ -4963,85 +4843,44 @@
 
     // Start the script
     function init() {
-        console.log('[EVAL] 🚀 ========================================');
-        console.log('[EVAL] 🚀 ChatCC Conversation Evaluator Starting...');
-        console.log('[EVAL] 🚀 ========================================');
-        console.log('[EVAL] 📄 Page URL:', window.location.href);
-        console.log('[EVAL] 📄 Page ready state:', document.readyState);
-        
         let attempts = 0;
         const maxAttempts = 1000;
-        
-        console.log('[EVAL] ⏳ Waiting for target button (button.source-icon)...');
-        console.log('[EVAL] ⏳ Will check every 1 second, max', maxAttempts, 'attempts');
         
         // First, wait for the target button to be available
         const waitForTarget = setInterval(async () => {
             attempts++;
             const targetButton = document.querySelector('button.source-icon');
             
-            // Log every 10 attempts to avoid spam
-            if (attempts % 10 === 0) {
-                console.log(`[EVAL] ⏳ Still waiting... Attempt ${attempts}/${maxAttempts}`);
-            }
-            
             if (targetButton || attempts >= maxAttempts) {
                 clearInterval(waitForTarget);
                 
                 if (attempts >= maxAttempts) {
-                    console.error('[EVAL] ❌ ========================================');
-                    console.error('[EVAL] ❌ TIMEOUT: Target button not found after', maxAttempts, 'attempts');
-                    console.error('[EVAL] ❌ The ERP page structure may have changed');
-                    console.error('[EVAL] ❌ Looking for: button.source-icon');
-                    console.error('[EVAL] ❌ ========================================');
+                    console.error('[EVAL] ❌ TIMEOUT: Target button (button.source-icon) not found after', maxAttempts, 'attempts');
                     return;
                 }
                 
-                console.log('[EVAL] ✅ Target button found after', attempts, 'attempts!');
-                
                 if (targetButton && !document.querySelector('.eval-button')) {
-                    console.log('[EVAL] 📊 Loading initial conversation data...');
-                    // Load data first to determine button state
                     getCurrentUserInfo();
                     if (currentConversationId) {
-                        console.log('[EVAL] 📥 Conversation detected, loading sheets...');
                         await loadAllSheets();
                         checkIfAlreadyRated();
-                    } else {
-                        console.log('[EVAL] ℹ️ No conversation loaded yet (normal on inbox/list page)');
                     }
                     
-                    // Now inject the button with the correct state
-                    console.log('[EVAL] 💉 Attempting button injection...');
                     if (injectButton()) {
-                        console.log('[EVAL] ✅ ========================================');
-                        console.log('[EVAL] ✅ Evaluation button successfully injected!');
-                        console.log('[EVAL] ✅ Starting DOM observer for conversation changes...');
-                        console.log('[EVAL] ✅ ========================================');
-                        
-                        // Start observing for conversation changes
                         observer.observe(document.body, {
                             childList: true,
                             subtree: true
                         });
-                        console.log('[EVAL] 👀 Observer is now watching for changes...');
-                    } else {
-                        console.error('[EVAL] ❌ Button injection failed - see errors above');
                     }
-                } else if (document.querySelector('.eval-button')) {
-                    console.log('[EVAL] ℹ️ Button already exists, skipping initialization');
                 }
             }
         }, 1000);
     }
 
     // Wait for page load
-    console.log('[EVAL] 🏁 Script loaded, checking document ready state...');
     if (document.readyState === 'loading') {
-        console.log('[EVAL] ⏳ Document still loading, waiting for DOMContentLoaded...');
         document.addEventListener('DOMContentLoaded', init);
     } else {
-        console.log('[EVAL] ✅ Document already loaded, starting immediately...');
         init();
     }
 })();
