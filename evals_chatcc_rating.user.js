@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.5.9
+// @version      1.6.0
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -2227,7 +2227,7 @@
                 <div class="eval-modal-footer">
                     <div class="eval-modal-footer-actions">
                         <button class="eval-btn eval-btn-secondary eval-modal-close">Cancel</button>
-                        <button class="eval-btn eval-btn-primary" id="eval-submit-btn">Submit</button>
+                        <button class="eval-btn eval-btn-primary" id="eval-submit-btn" disabled title="Rate at least one metric to submit">Submit</button>
                     </div>
                 </div>
             </div>
@@ -2289,8 +2289,28 @@
                 } else {
                     submitBtn.textContent = 'Process Metric(s)';
                 }
-            } else {
+                // Enable submit button for Add tab (has different validation)
+                submitBtn.disabled = false;
+                submitBtn.title = '';
+            } else if (tabName === 'rate') {
                 submitBtn.textContent = 'Submit';
+                // Check if any metrics are rated for Rate tab
+                const rateTab = overlay.querySelector('#eval-rate-tab');
+                if (rateTab) {
+                    const container = rateTab;
+                    const cards = container.querySelectorAll('#metrics-container .eval-metric-card');
+                    let hasAnyRating = false;
+                    
+                    for (const card of cards) {
+                        if (checkCardHasRating(card)) {
+                            hasAnyRating = true;
+                            break;
+                        }
+                    }
+                    
+                    submitBtn.disabled = !hasAnyRating;
+                    submitBtn.title = hasAnyRating ? '' : 'Rate at least one metric to submit';
+                }
             }
         }
     }
@@ -2497,6 +2517,41 @@
         // Setup keyboard navigation
         setupKeyboardNavigation(container, overlay);
 
+        // Update submit button state on any input change
+        const updateSubmitButton = () => {
+            updateMetricCompletionStatus(container);
+            
+            const submitBtn = overlay.querySelector('#eval-submit-btn');
+            if (!submitBtn) return;
+            
+            const cards = container.querySelectorAll('#metrics-container .eval-metric-card');
+            let hasAnyRating = false;
+            
+            for (const card of cards) {
+                if (checkCardHasRating(card)) {
+                    hasAnyRating = true;
+                    break;
+                }
+            }
+            
+            if (hasAnyRating) {
+                submitBtn.disabled = false;
+                submitBtn.title = '';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.title = 'Rate at least one metric to submit';
+            }
+        };
+
+        // Add listeners to all rating inputs
+        container.querySelectorAll('input[type="radio"], input[type="number"], input[type="checkbox"], input[type="text"], textarea, select').forEach(input => {
+            input.addEventListener('change', updateSubmitButton);
+            input.addEventListener('input', updateSubmitButton);
+        });
+
+        // Initial check to set button state on load
+        updateSubmitButton();
+
         // Prevent negative numbers in count inputs
         container.querySelectorAll('input[type="number"]').forEach(input => {
             // Prevent minus sign, decimal point, and scientific notation from being typed
@@ -2673,41 +2728,57 @@
     }
 
     // Check if a metric card has any rating
-    // Smart logic: Only count as "rated" if all required fields are filled OR if only optional fields exist
     function checkCardHasRating(card) {
-        // Check if there are any required fields without values
-        const requiredInputs = card.querySelectorAll('input[required], select[required], textarea[required]');
+        // Check if ANY Boolean radio button is selected (user interaction required)
+        const radioGroups = new Set();
+        card.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radioGroups.add(radio.name);
+        });
+        
+        // If there are radio groups, at least one must be checked
+        if (radioGroups.size > 0) {
+            let hasCheckedRadio = false;
+            for (const groupName of radioGroups) {
+                const checked = card.querySelector(`input[name="${groupName}"]:checked`);
+                if (checked) {
+                    hasCheckedRadio = true;
+                    break;
+                }
+            }
+            if (!hasCheckedRadio) return false;
+        }
 
-        for (const input of requiredInputs) {
-            if (input.type === 'radio') {
-                // For radio buttons, check if any in the group is checked
-                const name = input.name;
-                const checked = card.querySelector(`input[name="${name}"]:checked`);
-                if (!checked) return false;
-            } else if (input.type === 'checkbox') {
-                if (!input.checked) return false;
-            } else if (input.tagName === 'SELECT') {
-                if (!input.value || input.value === '') return false;
-            } else {
-                if (!input.value || input.value.trim() === '') return false;
+        // Check if ANY input has been filled (Count, Text, etc.)
+        const numberInputs = card.querySelectorAll('input[type="number"]');
+        const textInputs = card.querySelectorAll('input[type="text"], textarea');
+        
+        let hasFilledInput = false;
+        for (const input of numberInputs) {
+            if (input.value && input.value.trim() !== '') {
+                hasFilledInput = true;
+                break;
+            }
+        }
+        
+        if (!hasFilledInput) {
+            for (const input of textInputs) {
+                if (input.value && input.value.trim() !== '') {
+                    hasFilledInput = true;
+                    break;
+                }
             }
         }
 
-        // Check for select elements that have "Select an option" as default (these need user action)
+        // Check for select dropdowns with values
         const selects = card.querySelectorAll('select');
         for (const select of selects) {
-            // If select has no value and has a disabled placeholder, it needs selection
-            const hasPlaceholder = select.querySelector('option[disabled][selected]');
-            if (hasPlaceholder && (!select.value || select.value === '')) {
-                return false;
+            if (select.value && select.value !== '') {
+                return true; // Has selection
             }
         }
 
-        // If we have boolean fields with defaults (false), they're already "rated"
-        // If we have number fields with empty (defaulting to 0), they're "rated"
-        // If we have text fields empty (defaulting to blank), they're "rated"
-        // So if no required fields are missing and no selects need action, it's rated
-        return true;
+        // Card is rated if: has checked radio OR has filled input
+        return radioGroups.size > 0 || hasFilledInput;
     }
 
     function getMetricHelpText(metric) {
