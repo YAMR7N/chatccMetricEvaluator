@@ -181,7 +181,15 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.6.4)
+### Latest Changes (v1.6.5)
+- ✅ Improved "Select All Skills" functionality
+- ✅ Select All now checks/unchecks all individual skill checkboxes
+- ✅ Shows indeterminate state when some (but not all) skills are selected
+- ✅ More familiar checkbox behavior matching standard UI patterns
+- ✅ Restored original example text about "wrongToolCalled" and "requiredToolMissing"
+- ✅ Enhanced skills selector layout with highlighted Select All option
+
+### Previous Updates (v1.6.4)
 - ✅ **Improved Add Metric tab UX/UI**
 - ✅ Added step-by-step wizard feel with numbered steps (1, 2, 3)
 - ✅ Better visual hierarchy with color-coded sections
@@ -261,7 +269,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.6.4  
+**Version**: 1.6.5  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
