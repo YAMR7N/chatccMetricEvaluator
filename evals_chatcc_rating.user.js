@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.5.6
+// @version      1.5.7
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -40,8 +40,8 @@
     GM_addStyle(`
         /* Primary Colors - Matching ChatCC Platform */
         :root {
-            --eval-orange: #FF6B35;
-            --eval-orange-hover: #E55A2B;
+            --eval-orange:rgb(255, 167, 53);
+            --eval-orange-hover:rgb(229, 148, 43);
             --eval-orange-light: rgba(255, 107, 53, 0.1);
             --eval-dark-bg: #1e2936;
             --eval-card-bg: #293846;
@@ -1664,8 +1664,7 @@
         .eval-search-icon {
             position: absolute;
             left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 14px;
             color: var(--eval-text-muted);
             pointer-events: none;
         }
