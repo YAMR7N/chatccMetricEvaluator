@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.5.4
+// @version      1.5.5
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -822,6 +822,63 @@
             font-weight: 600;
             color: var(--eval-orange);
             margin: 0 0 12px 0;
+        }
+
+        /* Sub-metric collapsible styles */
+        .eval-sub-metric {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--eval-border);
+            border-radius: 6px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .eval-sub-metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .eval-sub-metric-header:hover {
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        .eval-sub-metric-header h5 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--eval-orange);
+            margin: 0;
+            flex: 1;
+        }
+
+        .eval-sub-metric-expand-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--eval-text-secondary);
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .eval-sub-metric.collapsed .eval-sub-metric-expand-icon {
+            transform: rotate(-90deg);
+        }
+
+        .eval-sub-metric-content {
+            padding: 0 16px 12px 16px;
+            max-height: 2000px;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .eval-sub-metric.collapsed .eval-sub-metric-content {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
         }
 
         .eval-sub-field-inputs {
@@ -2402,17 +2459,6 @@
                 <button class="eval-search-clear" id="eval-search-clear" title="Clear search">×</button>
             </div>
 
-            <!-- Progress Indicator -->
-            <div class="eval-progress-container">
-                <div class="eval-progress-header">
-                    <span class="eval-progress-text">Progress: <span class="eval-progress-count"><span id="rated-count">0</span>/${totalMetricsInView}</span> metrics rated</span>
-                    <span class="eval-progress-text" id="progress-percent">0%</span>
-                </div>
-                <div class="eval-progress-bar">
-                    <div class="eval-progress-fill" id="progress-fill" style="width: 0%"></div>
-                </div>
-            </div>
-
             <!-- Toolbar -->
             <div class="eval-toolbar">
                 <button class="eval-toolbar-btn" id="expand-all-btn" title="Expand all metrics">
@@ -2476,7 +2522,7 @@
             }
 
             html += `
-                <div class="eval-metric-card" data-metrics="${camelCaseNames.join(', ')}" data-metric-names="${metricNames.join(', ')}">
+                <div class="eval-metric-card collapsed" data-metrics="${camelCaseNames.join(', ')}" data-metric-names="${metricNames.join(', ')}">
                     <div class="eval-metric-card-header">
                         <div style="flex: 1;">
                             <div class="eval-metric-badge">
@@ -2527,19 +2573,17 @@
             });
         });
 
+        // Setup collapsible sub-metrics
+        container.querySelectorAll('.eval-sub-metric-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent parent card from toggling
+                const subMetric = header.closest('.eval-sub-metric');
+                subMetric.classList.toggle('collapsed');
+            });
+        });
+
         // Setup keyboard navigation
         setupKeyboardNavigation(container, overlay);
-
-        // Update progress when any rating is selected
-        const onRatingChange = () => {
-            updateProgress(container);
-        };
-
-        // Add listeners to all rating inputs
-        container.querySelectorAll('input[type="radio"], input[type="number"], input[type="checkbox"], input[type="text"], textarea, select').forEach(input => {
-            input.addEventListener('change', onRatingChange);
-            input.addEventListener('input', onRatingChange);
-        });
 
         // Prevent negative numbers in count inputs
         container.querySelectorAll('input[type="number"]').forEach(input => {
@@ -2664,6 +2708,9 @@
                 container.querySelectorAll('.eval-metric-card').forEach(card => {
                     card.classList.remove('collapsed');
                 });
+                container.querySelectorAll('.eval-sub-metric').forEach(subMetric => {
+                    subMetric.classList.remove('collapsed');
+                });
             });
         }
 
@@ -2671,6 +2718,9 @@
             collapseAllBtn.addEventListener('click', () => {
                 container.querySelectorAll('.eval-metric-card').forEach(card => {
                     card.classList.add('collapsed');
+                });
+                container.querySelectorAll('.eval-sub-metric').forEach(subMetric => {
+                    subMetric.classList.add('collapsed');
                 });
             });
         }
@@ -2696,31 +2746,18 @@
         }
     }
 
-    // Update progress indicator
-    function updateProgress(container) {
+    // Update metric card completion status (for "Show Unrated" button)
+    function updateMetricCompletionStatus(container) {
         const cards = container.querySelectorAll('#metrics-container .eval-metric-card');
-        let rated = 0;
 
         cards.forEach(card => {
             const hasRating = checkCardHasRating(card);
             if (hasRating) {
-                rated++;
                 card.classList.add('completed');
             } else {
                 card.classList.remove('completed');
             }
         });
-
-        const total = cards.length;
-        const percent = total > 0 ? Math.round((rated / total) * 100) : 0;
-
-        const ratedCountEl = container.querySelector('#rated-count');
-        const progressPercentEl = container.querySelector('#progress-percent');
-        const progressFillEl = container.querySelector('#progress-fill');
-
-        if (ratedCountEl) ratedCountEl.textContent = rated;
-        if (progressPercentEl) progressPercentEl.textContent = percent + '%';
-        if (progressFillEl) progressFillEl.style.width = percent + '%';
     }
 
     // Check if a metric card has any rating
@@ -2866,9 +2903,15 @@
         // Iterate through each sub-field (e.g., ProcessCompleteProfile, PaymentsTool)
         for (const [subFieldName, fields] of Object.entries(template)) {
             html += `
-                <div class="eval-sub-field-card">
-                    ${subFieldName !== 'General' ? `<h5 class="eval-sub-field-title">${subFieldName}</h5>` : ''}
-                    <div class="eval-sub-field-inputs">
+                <div class="eval-sub-metric collapsed" data-submetric="${subFieldName}">
+                    <div class="eval-sub-metric-header">
+                        <h5>${subFieldName}</h5>
+                        <svg class="eval-sub-metric-expand-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="eval-sub-metric-content">
+                        <div class="eval-sub-field-inputs">
             `;
 
             // Iterate through each property of the sub-field
@@ -2945,6 +2988,7 @@
             }
 
             html += `
+                        </div>
                     </div>
                 </div>
             `;
@@ -3109,7 +3153,7 @@
             }));
 
             html += `
-                <div class="eval-metric-card" style="opacity: 0.9;" data-metric-info="${metricData}">
+                <div class="eval-metric-card collapsed" style="opacity: 0.9;" data-metric-info="${metricData}">
                     <div class="eval-metric-card-header">
                         <div style="flex: 1;">
                             <div class="eval-metric-badge">
@@ -3147,6 +3191,15 @@
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
                 const card = header.closest('.eval-metric-card');
                 card.classList.toggle('collapsed');
+            });
+        });
+
+        // Setup collapsible sub-metrics in View Metrics tab
+        container.querySelectorAll('.eval-sub-metric-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent parent card from toggling
+                const subMetric = header.closest('.eval-sub-metric');
+                subMetric.classList.toggle('collapsed');
             });
         });
 
@@ -3334,9 +3387,15 @@
 
         for (const [subFieldName, fields] of Object.entries(template)) {
             html += `
-                <div class="eval-sub-field-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
-                    ${subFieldName !== 'General' ? `<h5 class="eval-sub-field-title" style="color: var(--eval-orange);">${subFieldName}</h5>` : ''}
-                    <div class="eval-sub-field-inputs">
+                <div class="eval-sub-metric collapsed" data-submetric="${subFieldName}">
+                    <div class="eval-sub-metric-header">
+                        <h5>${subFieldName}</h5>
+                        <svg class="eval-sub-metric-expand-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="eval-sub-metric-content">
+                        <div class="eval-sub-field-inputs">
             `;
 
             for (const [fieldName, fieldType] of Object.entries(fields)) {
@@ -3351,6 +3410,7 @@
             }
 
             html += `
+                        </div>
                     </div>
                 </div>
             `;
