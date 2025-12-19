@@ -181,7 +181,18 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.6.3)
+### Latest Changes (v1.6.4)
+- ✅ **Improved Add Metric tab UX/UI**
+- ✅ Added step-by-step wizard feel with numbered steps (1, 2, 3)
+- ✅ Better visual hierarchy with color-coded sections
+- ✅ Enhanced table styling with better borders and hover effects
+- ✅ Improved JSON textarea - dashed border, monospace font, better feedback
+- ✅ Added collapsible example JSON template in help text
+- ✅ Better spacing and section separators
+- ✅ Enhanced action buttons with icons and clearer styling
+- ✅ More informative help text for each step
+
+### Previous Updates (v1.6.3)
 - ✅ Changed metric counting to count cards instead of individual metrics
 - ✅ Grouped metrics now show as single card: "Metric 1/2" instead of "Metrics (1-2)/3"
 - ✅ More intuitive numbering - each card = one item
@@ -250,7 +261,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.6.3  
+**Version**: 1.6.4  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
