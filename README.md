@@ -103,9 +103,10 @@ const RATE_CONVERSATION_WEBHOOK = 'https://chadykarimfarah-manouella.app.n8n.clo
 - **Side Panel**: Resizable modal (480px default width)
 - **Info Bar**: Displays current skill and conversation ID
 - **Tab Navigation**: Switch between Rate/View/Add tabs
-- **Progress Bar**: Visual indicator of completion status
 - **Search Bar**: Filter metrics by name
-- **Toolbar**: Expand/Collapse/Filter controls
+- **Toolbar**: Expand All/Collapse All/Show Unrated controls
+- **Collapsible Metrics**: Main metric cards start collapsed by default
+- **Collapsible Sub-Metrics**: Template-based sub-metrics (like "Request_Service") have their own collapse/expand functionality
 
 ### Keyboard Shortcuts
 - `Esc` - Close panel
@@ -180,14 +181,23 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.5.4)
+### Latest Changes (v1.5.5)
+- ✅ Removed progress bar for cleaner interface
+- ✅ Metric cards now collapsed by default in both Rate and View Metrics tabs
+- ✅ Added collapsible sub-metrics with dropdown functionality
+- ✅ Sub-metrics (like "Request_Service") now have clickable headers with expand/collapse icons
+- ✅ All sub-metrics start collapsed by default for better organization
+- ✅ Expand All/Collapse All toolbar buttons now work with sub-metrics too
+- ✅ Improved UI hierarchy and reduced visual clutter
+
+### Previous Updates (v1.5.4)
 - ✅ Added comprehensive logging system with `[EVAL]` prefix
 - ✅ Created `chatccEvalDiagnostics()` console function for debugging
 - ✅ Enhanced all initialization steps with detailed status logging
 - ✅ Added DOM element detection logging
 - ✅ Improved error messages with actionable tips
 
-### Previous Updates (v1.5.3)
+### Earlier Updates (v1.5.3)
 - ✅ Removed redundant yellow warning card ("Rate at least one metric to submit")
 - ✅ Simplified validation flow - now only shows error on submission
 - ✅ Improved user experience by reducing visual clutter
@@ -206,7 +216,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.5.4  
+**Version**: 1.5.5  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
