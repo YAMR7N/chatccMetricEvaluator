@@ -141,9 +141,53 @@ Metrics can use structured templates:
 }
 ```
 
+## 🐛 Troubleshooting
+
+### Button Not Showing?
+
+If the "Evaluate" button doesn't appear, the script now includes comprehensive logging to help diagnose the issue:
+
+1. **Open Browser Console** (F12 or Right-click > Inspect > Console)
+2. **Look for `[EVAL]` prefixed messages** - these show the initialization process
+3. **Run diagnostics**: Type `chatccEvalDiagnostics()` in the console and press Enter
+
+The diagnostics will show:
+- ✅/❌ Whether the target button is found
+- ✅/❌ Whether you're on the correct URL
+- ✅/❌ Current conversation data (ID, Skill, Username)
+- ✅/❌ Whether the conversation is closed
+- ✅/❌ Whether sheets data loaded successfully
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Target button not found | ERP structure changed or page still loading | Wait a few seconds, refresh page, or check if `.source-icon` element exists |
+| Wrong URL | Not on ChatCC page | Navigate to `https://erp.maids.cc/chatcc*` |
+| No Conversation ID | On inbox/list page | Open a specific conversation |
+| Button exists but disabled | Conversation is open | Wait for conversation to close |
+
+### Log Levels
+
+The script uses emoji prefixes for easy scanning:
+- 🚀 **Initialization** - Script startup
+- 🔍 **Detection** - Finding elements
+- ✅ **Success** - Operation completed
+- ❌ **Error** - Something failed
+- ⚠️ **Warning** - Attention needed
+- 💡 **Tip** - Helpful information
+- 🔧 **Diagnostics** - Troubleshooting info
+
 ## 📝 Recent Updates
 
-### Latest Changes (Current Version)
+### Latest Changes (v1.5.4)
+- ✅ Added comprehensive logging system with `[EVAL]` prefix
+- ✅ Created `chatccEvalDiagnostics()` console function for debugging
+- ✅ Enhanced all initialization steps with detailed status logging
+- ✅ Added DOM element detection logging
+- ✅ Improved error messages with actionable tips
+
+### Previous Updates (v1.5.3)
 - ✅ Removed redundant yellow warning card ("Rate at least one metric to submit")
 - ✅ Simplified validation flow - now only shows error on submission
 - ✅ Improved user experience by reducing visual clutter
@@ -162,7 +206,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.5.3  
+**Version**: 1.5.4  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
