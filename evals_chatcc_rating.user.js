@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.6.5
+// @version      1.6.6
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -3700,7 +3700,7 @@
                 </label>
                 <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid var(--eval-success); border-radius: 4px;">
                     <p style="margin: 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
-                        💡 <strong>Multiple metrics in this form:</strong> Use this when you want to add several metrics that share the <strong>same output format/template</strong>. For example, "wrongToolCalled" and "requiredToolMissing" might both track tool usage errors with the same structure.
+                        <strong>Multiple metrics in this form:</strong> You can add several metrics that share the <strong>same output format/template</strong>. For example, "wrongToolCalled" and "requiredToolMissing" might both track tool usage errors with the same structure.
                     </p>
                 </div>
                 <table class="eval-config-table metric-pairs-table">
@@ -3742,7 +3742,7 @@
                 </label>
                 <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(59, 130, 246, 0.08); border-left: 3px solid #3B82F6; border-radius: 4px;">
                     <p style="margin: 0 0 8px 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
-                        📋 Paste a JSON template with <strong>actual values</strong>. The system will analyze the structure and field types.
+                        Paste a JSON template with <strong>actual values</strong>. The system will analyze the structure and field types.
                     </p>
                     <details style="margin-top: 8px;">
                         <summary style="cursor: pointer; color: var(--eval-orange); font-weight: 500; font-size: 13px;">Show Example</summary>
@@ -3766,7 +3766,7 @@
                 </label>
                 <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(139, 92, 246, 0.08); border-left: 3px solid #8B5CF6; border-radius: 4px;">
                     <p style="margin: 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
-                        🎯 Choose which skills this metric applies to. Check "Select All" for universal metrics.
+                        Choose which skills this metric applies to. Check "Select All" for universal metrics.
                     </p>
                 </div>
                 <div style="background: var(--eval-card-bg); border: 1.5px solid var(--eval-border); border-radius: 8px; padding: 16px;">
@@ -3774,10 +3774,6 @@
                         <label class="eval-skill-checkbox" style="background: rgba(255, 167, 53, 0.08); padding: 12px; border-radius: 6px; margin: 0; border: 1px solid rgba(255, 167, 53, 0.2);">
                             <input type="checkbox" class="skill-all" data-form="${formId}">
                             <span style="font-weight: 600; color: var(--eval-orange);">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
-                                    <path d="M9 2C6.48 2 4.44 4.04 4.44 6.56c0 2.24 2.66 6.09 4.03 7.93.27.36.71.51 1.14.51s.88-.15 1.14-.51c1.37-1.84 4.03-5.69 4.03-7.93C14.78 4.04 12.74 2 10.22 2 9 2 9 2 9 2zm0 8.93c-1.29 0-2.33-1.04-2.33-2.33s1.04-2.33 2.33-2.33 2.33 1.04 2.33 2.33S10.29 10.93 9 10.93zM11.5 9.5L9 12l-2.5-2.5"/>
-                                    <path d="M17 12h-2v2h2v-2zm0 4h-2v2h2v-2zm-4-4h-2v2h2v-2zm0 4h-2v2h2v-2zm0-8h-2v2h2V8zm-4 4H7v2h2v-2zm0 4H7v2h2v-2z"/>
-                                </svg>
                                 Select All Skills
                             </span>
                         </label>
