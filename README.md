@@ -181,7 +181,12 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.5.5)
+### Latest Changes (v1.5.6)
+- ✅ Updated theme colors to match ChatCC ERP blue-toned interface
+- ✅ Changed background colors from neutral gray to dark navy-blue
+- ✅ Better visual consistency with the main platform
+
+### Previous Updates (v1.5.5)
 - ✅ Removed progress bar for cleaner interface
 - ✅ Metric cards now collapsed by default in both Rate and View Metrics tabs
 - ✅ Added collapsible sub-metrics with dropdown functionality
@@ -216,7 +221,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.5.5  
+**Version**: 1.5.6  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
