@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.6.2
+// @version      1.6.3
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -2450,9 +2450,12 @@
             <div id="metrics-container">
         `;
 
-        let overallMetricIndex = 0; // Track overall metric count across all cards
+        let cardIndex = 0; // Track card count (not individual metric count)
+        const totalCards = templateGroups.size; // Total number of cards
 
         templateGroups.forEach((groupedMetrics, templateKey) => {
+            cardIndex++; // Increment for each card
+            
             // Use first metric for template parsing
             const firstMetric = groupedMetrics[0];
 
@@ -2461,19 +2464,8 @@
             const metricDescriptions = groupedMetrics.map(m => getMetricHelpText(m)).filter(d => d);
             const camelCaseNames = groupedMetrics.map(m => toCamelCase(m.Definition));
 
-            // Calculate metric range for this card
-            const startIndex = overallMetricIndex + 1;
-            const endIndex = overallMetricIndex + groupedMetrics.length;
-            const totalMetricsCount = metrics.length;
-            overallMetricIndex = endIndex;
-
-            // Determine badge text
-            let badgeText;
-            if (groupedMetrics.length > 1) {
-                badgeText = `Metrics (${startIndex}-${endIndex})/${totalMetricsCount}`;
-            } else {
-                badgeText = `Metric ${startIndex}/${totalMetricsCount}`;
-            }
+            // Badge text - just show card number
+            const badgeText = `Metric ${cardIndex}/${totalCards}`;
 
             // Parse template if it exists
             let template = null;
@@ -3120,32 +3112,26 @@
             <div style="padding: 0 0 16px 0;">
                 <div class="eval-note" style="padding: 12px; background: rgba(255, 107, 53, 0.1); border-left: 3px solid var(--eval-orange); border-radius: 4px;">
                     <p style="margin: 0; color: var(--eval-text-secondary); font-size: 14px;">
-                        Read-only view of <strong>${metrics.length}</strong> metrics for <strong>${currentSkill}</strong> skill.${canEdit ? ' Click Edit to modify.' : ''}
+                        Read-only view of <strong>${templateGroups.size}</strong> metric cards for <strong>${currentSkill}</strong> skill.${canEdit ? ' Click Edit to modify.' : ''}
                     </p>
                 </div>
             </div>
             <div id="view-metrics-container">
         `;
-        let overallMetricIndex = 0;
+        let cardIndex = 0; // Track card count
+        const totalCards = templateGroups.size; // Total number of cards
 
         templateGroups.forEach((groupedMetrics, templateKey) => {
+            cardIndex++; // Increment for each card
+            
             const firstMetric = groupedMetrics[0];
             const metricNames = groupedMetrics.map(m => m.Definition);
             const metricDescriptions = groupedMetrics.map(m => getMetricHelpText(m)).filter(d => d);
             const metricSkills = firstMetric.Skills || '';
             const isEnabled = firstMetric.Enabled !== 'FALSE' && firstMetric.Enabled !== false;
 
-            const startIndex = overallMetricIndex + 1;
-            const endIndex = overallMetricIndex + groupedMetrics.length;
-            const totalMetricsCount = metrics.length;
-            overallMetricIndex = endIndex;
-
-            let badgeText;
-            if (groupedMetrics.length > 1) {
-                badgeText = `Metrics (${startIndex}-${endIndex})/${totalMetricsCount}`;
-            } else {
-                badgeText = `Metric ${startIndex}/${totalMetricsCount}`;
-            }
+            // Badge text - just show card number
+            const badgeText = `Metric ${cardIndex}/${totalCards}`;
 
             let template = null;
             if (firstMetric.Template) {
