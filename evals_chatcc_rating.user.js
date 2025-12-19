@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.6.4
+// @version      1.6.5
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -3700,7 +3700,7 @@
                 </label>
                 <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid var(--eval-success); border-radius: 4px;">
                     <p style="margin: 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
-                        💡 Add multiple metrics here if they share the same template structure.
+                        💡 <strong>Multiple metrics in this form:</strong> Use this when you want to add several metrics that share the <strong>same output format/template</strong>. For example, "wrongToolCalled" and "requiredToolMissing" might both track tool usage errors with the same structure.
                     </p>
                 </div>
                 <table class="eval-config-table metric-pairs-table">
@@ -3766,22 +3766,30 @@
                 </label>
                 <div class="eval-note" style="margin-bottom: 12px; padding: 10px; background: rgba(139, 92, 246, 0.08); border-left: 3px solid #8B5CF6; border-radius: 4px;">
                     <p style="margin: 0; color: var(--eval-text-secondary); font-size: 13px; line-height: 1.5;">
-                        🎯 Choose which skills this metric applies to. Select "All Skills" for universal metrics.
+                        🎯 Choose which skills this metric applies to. Check "Select All" for universal metrics.
                     </p>
                 </div>
-                <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 6px;">
-                    <label class="eval-checkbox-label" style="cursor: pointer;">
-                        <input type="checkbox" class="skill-all" data-form="${formId}">
-                        <span style="font-weight: 600;">All Skills</span>
-                    </label>
-                </div>
-                <div class="eval-skills-selector">
-                    ${getAllSkills().map(skill => `
-                        <label class="eval-skill-checkbox">
-                            <input type="checkbox" class="skill-checkbox" value="${skill}">
-                            <span>${skill}</span>
+                <div style="background: var(--eval-card-bg); border: 1.5px solid var(--eval-border); border-radius: 8px; padding: 16px;">
+                    <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <label class="eval-skill-checkbox" style="background: rgba(255, 167, 53, 0.08); padding: 12px; border-radius: 6px; margin: 0; border: 1px solid rgba(255, 167, 53, 0.2);">
+                            <input type="checkbox" class="skill-all" data-form="${formId}">
+                            <span style="font-weight: 600; color: var(--eval-orange);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                                    <path d="M9 2C6.48 2 4.44 4.04 4.44 6.56c0 2.24 2.66 6.09 4.03 7.93.27.36.71.51 1.14.51s.88-.15 1.14-.51c1.37-1.84 4.03-5.69 4.03-7.93C14.78 4.04 12.74 2 10.22 2 9 2 9 2 9 2zm0 8.93c-1.29 0-2.33-1.04-2.33-2.33s1.04-2.33 2.33-2.33 2.33 1.04 2.33 2.33S10.29 10.93 9 10.93zM11.5 9.5L9 12l-2.5-2.5"/>
+                                    <path d="M17 12h-2v2h2v-2zm0 4h-2v2h2v-2zm-4-4h-2v2h2v-2zm0 4h-2v2h2v-2zm0-8h-2v2h2V8zm-4 4H7v2h2v-2zm0 4H7v2h2v-2z"/>
+                                </svg>
+                                Select All Skills
+                            </span>
                         </label>
-                    `).join('')}
+                    </div>
+                    <div class="eval-skills-selector" style="max-height: 180px; overflow-y: auto; border: none; padding: 0;">
+                        ${getAllSkills().map(skill => `
+                            <label class="eval-skill-checkbox">
+                                <input type="checkbox" class="skill-checkbox" value="${skill}">
+                                <span>${skill}</span>
+                            </label>
+                        `).join('')}
+                    </div>
                 </div>
             </div>
         `;
@@ -3790,16 +3798,33 @@
 
         // Event listeners for this form
         const skillAllCheckbox = formCard.querySelector('.skill-all');
-        const skillsSelector = formCard.querySelector('.eval-skills-selector');
+        const skillCheckboxes = formCard.querySelectorAll('.skill-checkbox');
 
-        // Set initial state based on checkbox
-        skillsSelector.style.display = skillAllCheckbox.checked ? 'none' : 'block';
-
+        // Select All functionality
         skillAllCheckbox.addEventListener('change', (e) => {
-            skillsSelector.style.display = e.target.checked ? 'none' : 'block';
-            if (e.target.checked) {
-                formCard.querySelectorAll('.skill-checkbox').forEach(cb => cb.checked = false);
-            }
+            const isChecked = e.target.checked;
+            skillCheckboxes.forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+
+        // Update Select All when individual checkboxes change
+        skillCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const allChecked = Array.from(skillCheckboxes).every(cb => cb.checked);
+                const noneChecked = Array.from(skillCheckboxes).every(cb => !cb.checked);
+                
+                if (allChecked) {
+                    skillAllCheckbox.checked = true;
+                    skillAllCheckbox.indeterminate = false;
+                } else if (noneChecked) {
+                    skillAllCheckbox.checked = false;
+                    skillAllCheckbox.indeterminate = false;
+                } else {
+                    skillAllCheckbox.checked = false;
+                    skillAllCheckbox.indeterminate = true;
+                }
+            });
         });
 
         // Metric Pairs Table Handlers
