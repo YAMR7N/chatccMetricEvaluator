@@ -181,7 +181,12 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.5.7)
+### Latest Changes (v1.5.8)
+- ✅ Removed excessive console logging (161 lines removed)
+- ✅ Kept only critical error logs and diagnostic function
+- ✅ Improved performance by reducing console spam
+
+### Previous Updates (v1.5.7)
 - ✅ Fixed search icon vertical alignment in search bar
 
 ### Previous Updates (v1.5.6)
@@ -224,7 +229,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.5.7  
+**Version**: 1.5.8  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
