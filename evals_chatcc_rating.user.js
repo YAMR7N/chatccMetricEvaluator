@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.5.5
+// @version      1.5.6
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -43,9 +43,9 @@
             --eval-orange: #FF6B35;
             --eval-orange-hover: #E55A2B;
             --eval-orange-light: rgba(255, 107, 53, 0.1);
-            --eval-dark-bg: #1a1a1a;
-            --eval-card-bg: #242424;
-            --eval-border: #3a3a3a;
+            --eval-dark-bg: #1e2936;
+            --eval-card-bg: #293846;
+            --eval-border: #3d4a5c;
             --eval-text-primary: #ffffff;
             --eval-text-secondary: #b0b0b0;
             --eval-text-muted: #808080;
