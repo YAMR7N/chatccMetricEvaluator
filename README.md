@@ -181,7 +181,17 @@ The script uses emoji prefixes for easy scanning:
 
 ## 📝 Recent Updates
 
-### Latest Changes (v1.6.5)
+### Latest Changes (v1.7.0)
+- ✅ **Simplified single sub-metric display** - When a metric has only one sub-metric, fields now display directly without wrapper
+- ✅ Removed unnecessary collapsible layer for single sub-metrics
+- ✅ Cleaner UI - metric card expands directly to show fields
+- ✅ Applied to both Rate and View Metrics tabs
+
+### Previous Updates (v1.6.6)
+- ✅ Removed emojis from Add Metric tab for cleaner professional look
+- ✅ Removed unnecessary SVG icon from "Select All Skills" 
+
+### Earlier Updates (v1.6.5)
 - ✅ Improved "Select All Skills" functionality
 - ✅ Select All now checks/unchecks all individual skill checkboxes
 - ✅ Shows indeterminate state when some (but not all) skills are selected
@@ -269,7 +279,7 @@ Internal use only - MAIDS.CC
 
 ---
 
-**Version**: 1.6.5  
+**Version**: 1.7.0  
 **Last Updated**: December 2025  
 **Platform**: ChatCC ERP - MAIDS.CC
 
