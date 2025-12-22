@@ -2797,50 +2797,28 @@
     
     // Check if user has modified ANY input (for confirmation modal)
     function hasUserModifiedAnyInput(container) {
-        console.log('[EVAL] 🔍 Checking if user modified any input...');
-        
         // Check if any radio button is checked WITH "True" (False is default)
         const anyTrueChecked = container.querySelector('input[type="radio"][value="true"]:checked');
-        console.log('[EVAL] 📊 Any "True" radio checked:', !!anyTrueChecked);
         if (anyTrueChecked) return true;
         
         // Check if any number input has a value
         const numberInputs = container.querySelectorAll('input[type="number"]');
-        let hasNumberValue = false;
         for (const input of numberInputs) {
-            if (input.value && input.value.trim() !== '') {
-                hasNumberValue = true;
-                break;
-            }
+            if (input.value && input.value.trim() !== '') return true;
         }
-        console.log('[EVAL] 📊 Any number input filled:', hasNumberValue);
-        if (hasNumberValue) return true;
         
         // Check if any text input has a value
         const textInputs = container.querySelectorAll('input[type="text"], textarea');
-        let hasTextValue = false;
         for (const input of textInputs) {
-            if (input.value && input.value.trim() !== '') {
-                hasTextValue = true;
-                break;
-            }
+            if (input.value && input.value.trim() !== '') return true;
         }
-        console.log('[EVAL] 📊 Any text input filled:', hasTextValue);
-        if (hasTextValue) return true;
         
         // Check if any select has a value (non-default)
         const selects = container.querySelectorAll('select');
-        let hasSelectValue = false;
         for (const select of selects) {
-            if (select.value && select.value !== '') {
-                hasSelectValue = true;
-                break;
-            }
+            if (select.value && select.value !== '') return true;
         }
-        console.log('[EVAL] 📊 Any select dropdown selected:', hasSelectValue);
-        if (hasSelectValue) return true;
         
-        console.log('[EVAL] ✅ Result: User has NOT modified anything - will show confirmation');
         return false; // Nothing modified
     }
 
@@ -2947,13 +2925,9 @@
         let html = '';
         const subMetricsCount = Object.keys(template).length;
         const hasOnlyOneSubMetric = subMetricsCount === 1;
-        
-        console.log('[EVAL] Rendering template - Sub-metrics count:', subMetricsCount, '| Has only one:', hasOnlyOneSubMetric);
 
         // Iterate through each sub-field (e.g., ProcessCompleteProfile, PaymentsTool)
         for (const [subFieldName, fields] of Object.entries(template)) {
-            console.log('[EVAL] Processing sub-metric:', subFieldName, '| Using simplified layout:', hasOnlyOneSubMetric);
-            
             if (hasOnlyOneSubMetric) {
                 // Single sub-metric: render fields directly without wrapper (no header, no collapse)
                 html += `<div class="eval-sub-field-inputs" style="padding: 0;">`;
@@ -3986,26 +3960,15 @@
         const rateTab = overlay.querySelector('#eval-rate-tab');
         const footer = overlay.querySelector('.eval-modal-footer');
         
-        console.log('[EVAL] 🚀 ========================================');
-        console.log('[EVAL] 🚀 Submit button clicked - starting validation');
-        console.log('[EVAL] 🚀 ========================================');
-        
         // Check if user has modified any input
         const userModified = hasUserModifiedAnyInput(rateTab);
-        console.log('[EVAL] 📊 hasUserModifiedAnyInput result:', userModified);
         
         if (!userModified) {
-            console.log('[EVAL] ⚠️ No modifications detected - showing confirmation modal...');
             // Show confirmation modal
             const shouldProceed = await showDefaultValuesConfirmation();
-            console.log('[EVAL] 📊 User confirmation result:', shouldProceed ? 'Proceed' : 'Cancelled');
             if (!shouldProceed) {
-                console.log('[EVAL] ❌ User cancelled - aborting submission');
                 return; // User cancelled
             }
-            console.log('[EVAL] ✅ User confirmed - proceeding with defaults');
-        } else {
-            console.log('[EVAL] ✅ User has modified inputs - skipping confirmation modal');
         }
         
         const ratings = [];
