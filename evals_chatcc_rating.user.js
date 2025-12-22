@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.7.0
+// @version      1.7.1
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -2947,12 +2947,16 @@
         let html = '';
         const subMetricsCount = Object.keys(template).length;
         const hasOnlyOneSubMetric = subMetricsCount === 1;
+        
+        console.log('[EVAL] Rendering template - Sub-metrics count:', subMetricsCount, '| Has only one:', hasOnlyOneSubMetric);
 
         // Iterate through each sub-field (e.g., ProcessCompleteProfile, PaymentsTool)
         for (const [subFieldName, fields] of Object.entries(template)) {
+            console.log('[EVAL] Processing sub-metric:', subFieldName, '| Using simplified layout:', hasOnlyOneSubMetric);
+            
             if (hasOnlyOneSubMetric) {
-                // Single sub-metric: render fields directly without wrapper
-                html += `<div class="eval-sub-field-inputs">`;
+                // Single sub-metric: render fields directly without wrapper (no header, no collapse)
+                html += `<div class="eval-sub-field-inputs" style="padding: 0;">`;
             } else {
                 // Multiple sub-metrics: use collapsible wrapper
                 html += `
