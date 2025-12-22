@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatCC Conversation Evaluator
 // @namespace    http://tampermonkey.net/
-// @version      1.6.6
+// @version      1.7.0
 // @description  Rate conversations and manage evaluation metrics for ChatCC
 // @author       ChatCC Team
 // @match        https://erp.maids.cc/chatcc*
@@ -2945,20 +2945,28 @@
         const primaryMetricName = namesArray[0];
 
         let html = '';
+        const subMetricsCount = Object.keys(template).length;
+        const hasOnlyOneSubMetric = subMetricsCount === 1;
 
         // Iterate through each sub-field (e.g., ProcessCompleteProfile, PaymentsTool)
         for (const [subFieldName, fields] of Object.entries(template)) {
-            html += `
-                <div class="eval-sub-metric collapsed" data-submetric="${subFieldName}">
-                    <div class="eval-sub-metric-header">
-                        <h5>${subFieldName}</h5>
-                        <svg class="eval-sub-metric-expand-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="eval-sub-metric-content">
-                        <div class="eval-sub-field-inputs">
-            `;
+            if (hasOnlyOneSubMetric) {
+                // Single sub-metric: render fields directly without wrapper
+                html += `<div class="eval-sub-field-inputs">`;
+            } else {
+                // Multiple sub-metrics: use collapsible wrapper
+                html += `
+                    <div class="eval-sub-metric collapsed" data-submetric="${subFieldName}">
+                        <div class="eval-sub-metric-header">
+                            <h5>${subFieldName}</h5>
+                            <svg class="eval-sub-metric-expand-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div class="eval-sub-metric-content">
+                            <div class="eval-sub-field-inputs">
+                `;
+            }
 
             // Iterate through each property of the sub-field
             for (const [fieldName, fieldTypeStr] of Object.entries(fields)) {
@@ -3033,11 +3041,17 @@
                 html += `</div>`;
             }
 
-            html += `
+            if (hasOnlyOneSubMetric) {
+                // Single sub-metric: just close the field inputs div
+                html += `</div>`;
+            } else {
+                // Multiple sub-metrics: close all wrapper divs
+                html += `
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
 
         return html;
@@ -3424,19 +3438,27 @@
 
     function renderViewTemplateBasedMetric(template) {
         let html = '';
+        const subMetricsCount = Object.keys(template).length;
+        const hasOnlyOneSubMetric = subMetricsCount === 1;
 
         for (const [subFieldName, fields] of Object.entries(template)) {
-            html += `
-                <div class="eval-sub-metric collapsed" data-submetric="${subFieldName}">
-                    <div class="eval-sub-metric-header">
-                        <h5>${subFieldName}</h5>
-                        <svg class="eval-sub-metric-expand-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                    <div class="eval-sub-metric-content">
-                        <div class="eval-sub-field-inputs">
-            `;
+            if (hasOnlyOneSubMetric) {
+                // Single sub-metric: render fields directly without wrapper
+                html += `<div class="eval-sub-field-inputs">`;
+            } else {
+                // Multiple sub-metrics: use collapsible wrapper
+                html += `
+                    <div class="eval-sub-metric collapsed" data-submetric="${subFieldName}">
+                        <div class="eval-sub-metric-header">
+                            <h5>${subFieldName}</h5>
+                            <svg class="eval-sub-metric-expand-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div class="eval-sub-metric-content">
+                            <div class="eval-sub-field-inputs">
+                `;
+            }
 
             for (const [fieldName, fieldType] of Object.entries(fields)) {
                 html += `
@@ -3449,11 +3471,17 @@
                 `;
             }
 
-            html += `
+            if (hasOnlyOneSubMetric) {
+                // Single sub-metric: just close the field inputs div
+                html += `</div>`;
+            } else {
+                // Multiple sub-metrics: close all wrapper divs
+                html += `
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
 
         return html;
